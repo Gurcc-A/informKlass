@@ -8,6 +8,30 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Редактор коду: стилі лише для цієї сторінки, кольори беруться зі змінних теми */
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .play { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: var(--play-h, 30rem); }
+    .play-grip { height: 1.4rem; margin-top: -0.4rem; display: grid; place-items: center; cursor: ns-resize; touch-action: none; border-radius: 8px; }
+    .play-grip::before { content: ""; width: 3.5rem; height: 0.3rem; border-radius: 999px; background: var(--line); }
+    .play-grip:hover::before, .play-grip:focus-visible::before { background: var(--accent); }
+    @media (max-width: 800px) { .play { grid-template-columns: minmax(0, 1fr); } }
+    .play-pane { gap: 0.75rem; min-height: 0; }
+    .play-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; min-height: 2.5rem; }
+    .play-bar .btn { padding: 0.5rem 0.95rem; font-size: 0.92rem; }
+    .play-title { font: 600 0.97rem var(--f-body); }
+    .play-status { margin-left: auto; font: 500 0.8rem var(--f-mono); color: var(--ink-2); }
+    .sel { flex: 1 1 9rem; min-width: 0; font: 500 0.95rem var(--f-body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 0.5rem 0.7rem; cursor: pointer; }
+    .editor { flex: 1 1 auto; width: 100%; min-height: 0; resize: none; font: 400 0.88rem/1.6 var(--f-mono); tab-size: 4; white-space: pre; overflow: auto; background: var(--code-bg); color: var(--code-ink); border: 0; border-radius: 12px; padding: 0.9rem 1rem; }
+    .play-in { display: flex; flex-direction: column; gap: 0.3rem; }
+    .play-in label { font-size: 0.8rem; color: var(--ink-2); }
+    .play-in .inp { resize: vertical; font-size: 0.88rem; }
+    .play-out { flex: 1 1 auto; margin: 0; min-height: 0; white-space: pre-wrap; overflow: auto; border-radius: 12px; padding: 0.9rem 1rem; }
+    .play-out .err { color: #F2A38F; }
+    .play-out .dim { color: var(--code-dim); }
+    .play-frame { flex: 1 1 auto; width: 100%; min-height: 0; border: 0; border-radius: 12px; background: #fff; }
+    .editor:focus-visible, .sel:focus-visible, .play-in .inp:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  </style>
 </head>
 <body>
 <header class="top">
@@ -31,25 +55,26 @@
     <div class="head">
       <span class="eyebrow">Для допитливих</span>
       <h2 id="h-fun">Цікавинки</h2>
+      <p class="lead">Історії з життя комп’ютерів, двійковий перекладач, вікторина й власний редактор коду: усе, щоб інформатика була ще цікавішою.</p>
     </div>
 
     <div class="block">
-      <h3>З історії</h3>
+      <h3><span class="ico" aria-hidden="true">🕰️</span>З історії</h3>
       <div class="grid">
-        <div class="card fact t-sage"><span class="yr">1947</span><h4>Перший «баг»</h4><p>У реле комп’ютера Harvard Mark II знайшли справжню міль. Команда Грейс Гоппер приклеїла її до журналу з підписом про «першу знайдену комаху».</p></div>
-        <div class="card fact t-butter"><span class="yr">1950</span><h4>МЕСМ у Києві</h4><p>Під керівництвом Сергія Лебедєва запрацювала МЕСМ, перша електронна обчислювальна машина на континенті Європи.</p></div>
-        <div class="card fact t-mint"><span class="yr">1971</span><h4>Знак @ в е-пошті</h4><p>Рей Томлінсон надіслав перший лист між комп’ютерами і вибрав символ @, щоб відокремити ім’я користувача від назви машини.</p></div>
-        <div class="card fact t-butter"><span class="yr">1991</span><h4>Перший сайт</h4><p>Тім Бернерс-Лі в CERN відкрив для всіх перший у світі вебсайт, який розповідав, що таке World Wide Web.</p></div>
+        <div class="card fact t-sage"><span class="yr">1940</span><h4>Перші програмістки</h4><p>Перші програмісти були жінками – у 1940-х роках саме вони працювали над кодами для військових комп’ютерів. Їхній внесок довго залишався недооціненим.</p></div>
+        <div class="card fact t-butter"><span class="yr">1947</span><h4>Перший «баг»</h4><p>У реле комп’ютера Harvard Mark II знайшли справжню міль. Команда Грейс Гоппер приклеїла її до журналу з підписом про «першу знайдену комаху».</p></div>
+        <div class="card fact t-mint"><span class="yr">1950</span><h4>МЕСМ у Києві</h4><p>Під керівництвом Сергія Лебедєва запрацювала МЕСМ, перша електронна обчислювальна машина на континенті Європи.</p></div>
+        <div class="card fact t-sage"><span class="yr">1962</span><h4>Один дефіс</h4><p>У листопаді 1962 року через пропущений дефіс у комп’ютерній програмі довелося підірвати американську ракету, що летіла до Венери.</p></div>
+        <div class="card fact t-butter"><span class="yr">1971</span><h4>Знак @ в е-пошті</h4><p>Рей Томлінсон надіслав перший лист між комп’ютерами і вибрав символ @, щоб відокремити ім’я користувача від назви машини.</p></div>
+        <div class="card fact t-mint"><span class="yr">1991</span><h4>Перший сайт</h4><p>Тім Бернерс-Лі в CERN відкрив для всіх перший у світі вебсайт, який розповідав, що таке World Wide Web.</p></div>
         <div class="card fact t-sage"><span class="yr">1991</span><h4>Звідки Python</h4><p>Мову Python назвали не на честь змії, а на честь британського комедійного шоу «Літаючий цирк Монті Пайтона».</p></div>
         <div class="card fact t-butter"><span class="yr">1999</span><h4>Перші емодзі</h4><p>Сігетака Куріта створив для японського мобільного інтернету набір із 176 піктограм розміром 12×12 пікселів.</p></div>
-        <div class="card fact t-mint"><span class="yr">1962</span><h4>Один дефіс</h4><p>У листопаді 1962 року через пропущений дефіс у комп'ютерній програмі довелося підірвати американську ракету, що летіла до Венери.</p></div>
-        <div class="card fact t-butter"><span class="yr">1940</span><h4>Перші програмістки</h4><p>Перші програмісти були жінками – у 1940-х роках саме вони працювали над кодами для військових комп’ютерів. Їхній внесок довго залишався недооціненим.</p></div>
       </div>
     </div>
 
     <div class="split">
       <div class="col block">
-        <h3>Двійковий перекладач</h3>
+        <h3><span class="ico" aria-hidden="true">🔢</span>Двійковий перекладач</h3>
         <div class="card tool-box">
           <label for="num">Число в двійковій системі</label>
           <input class="inp" id="num" type="text" inputmode="numeric" value="2026" autocomplete="off">
@@ -57,14 +82,50 @@
           <label for="txt">Слово в двійковому коді</label>
           <input class="inp" id="txt" type="text" value="Привіт" autocomplete="off">
           <div class="out" id="txtOut" aria-live="polite"></div>
+          <label for="bin">Двійкове число в десяткову систему</label>
+          <input class="inp" id="bin" type="text" inputmode="numeric" value="11111010010" autocomplete="off">
+          <div class="out" id="binOut" aria-live="polite"></div>
+          <div class="funfact"><span class="ico" aria-hidden="true">💡</span><span>Цікаво: слово «біт» походить від англ. binary digit, «двійкова цифра». Один байт із 8 бітів може набувати 256 різних значень, від 00000000 до 11111111.</span></div>
           <p class="note">Кожна літера записується одним або кількома байтами по 8 бітів. Кирилиця займає по два байти, латиниця по одному.</p>
         </div>
       </div>
       <div class="col block">
-        <h3>Міні-вікторина</h3>
+        <h3><span class="ico" aria-hidden="true">🧠</span>Міні-вікторина</h3>
         <div class="quiz" id="quiz"></div>
         <p class="score" id="score" aria-live="polite"></p>
       </div>
+    </div>
+
+    <div class="block" id="play">
+      <h3><span class="ico" aria-hidden="true">💻</span>Редактор коду</h3>
+      <p class="lead">Напишіть програму, виберіть мову й натисніть «Запустити». Результат з’явиться праворуч, а готовий код можна завантажити файлом.</p>
+      <div class="play" id="playBox">
+        <div class="card play-pane">
+          <div class="play-bar">
+            <label class="sr" for="lang">Мова програмування</label>
+            <select class="sel" id="lang"></select>
+            <button class="btn fill" id="run" type="button">▶ Запустити</button>
+            <button class="btn line" id="dl" type="button">⬇ Завантажити код</button>
+          </div>
+          <label class="sr" for="code">Код програми</label>
+          <textarea class="editor" id="code" spellcheck="false" autocomplete="off" autocapitalize="off" wrap="off"></textarea>
+          <div class="play-in" id="stdinBox">
+            <label for="stdin">Вхідні дані для input, prompt, cin, Scanner (кожен рядок окремо)</label>
+            <textarea class="inp" id="stdin" rows="2" spellcheck="false" autocomplete="off"></textarea>
+          </div>
+        </div>
+        <div class="card play-pane">
+          <div class="play-bar">
+            <span class="play-title">Результат</span>
+            <span class="play-status" id="status" aria-live="polite"></span>
+          </div>
+          <pre class="out play-out" id="result" aria-live="polite"></pre>
+          <iframe class="play-frame" id="preview" title="Результат: веб-сторінка" sandbox="allow-scripts" hidden></iframe>
+        </div>
+      </div>
+      <div class="play-grip" id="grip" role="separator" aria-orientation="horizontal" aria-label="Висота вікон: потягніть вниз або натискайте стрілки вгору й вниз" title="Потягніть вниз, щоб збільшити вікна" tabindex="0"></div>
+      <p class="note" id="playNote"></p>
+      <p class="note">Щоб збільшити вікна, потягніть смужку під ними вниз. Клавіша Tab у редакторі вставляє відступ, а щоб перейти далі, натисніть Esc, а потім Tab. Запуск: Ctrl+Enter.</p>
     </div>
   </section>
 </main>
@@ -77,5 +138,417 @@
 </footer>
 
 <script src="script.js"></script>
+<script>
+(function () {
+  const sel = document.getElementById('lang');
+  if (!sel) return;
+  const byId = id => document.getElementById(id);
+  const codeEl = byId('code'), stdinEl = byId('stdin'), stdinBox = byId('stdinBox');
+  const runBtn = byId('run'), dlBtn = byId('dl'), resEl = byId('result');
+  const frame = byId('preview'), statusEl = byId('status'), noteEl = byId('playNote');
+
+  /* Сервіс, який виконує Java, C++, C#, C, TypeScript, PHP і Go. Якщо матимете власний сервер Judge0, змініть адресу тут. */
+  const JUDGE0 = 'https://ce.judge0.com';
+
+  const NOTE_REMOTE = 'Цю мову виконує безкоштовний онлайн-сервіс Judge0, тому потрібен інтернет, а під час великого навантаження запуск може бути повільним. Кирилиця у виводі може відображатися некоректно.';
+
+  /* 10 мов: назва, ім’я файла для завантаження, спосіб запуску, стартовий код */
+  const LANGS = [
+    { id: 'py', name: 'Python', file: 'main.py', kind: 'py', stdin: 'Марія',
+      note: 'Python виконується просто у браузері. Перший запуск завантажує інтерпретатор, це може тривати кілька секунд. Для input() вводьте дані в полі нижче.',
+      code: `# Моя перша програма
+name = input("Як тебе звати? ")
+print("Привіт,", name + "!")
+
+for i in range(1, 4):
+    print("Рядок", i)
+` },
+    { id: 'js', name: 'JavaScript', file: 'script.js', kind: 'js', stdin: 'Марія',
+      note: 'JavaScript виконується просто у браузері. Для введення даних використовуйте prompt(), а виводити можна через console.log().',
+      code: `// Моя перша програма
+const name = prompt("Як тебе звати?");
+console.log("Привіт, " + name + "!");
+
+for (let i = 1; i <= 3; i++) {
+  console.log("Рядок " + i);
+}
+` },
+    { id: 'html', name: 'HTML + CSS', file: 'index.html', kind: 'html',
+      note: 'Сторінку видно праворуч одразу після натискання «Запустити». Стилі пишіть у тегу style, а скрипти в тегу script.',
+      code: `<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <title>Моя сторінка</title>
+  <style>
+    body { font-family: sans-serif; background: #f2f7ef; text-align: center; padding: 2rem; }
+    h1 { color: #3a7556; }
+  </style>
+</head>
+<body>
+  <h1>Привіт, світе!</h1>
+  <p>Це моя перша веб-сторінка.</p>
+</body>
+</html>
+` },
+    { id: 'java', name: 'Java', file: 'Main.java', kind: 'remote', j0: 91,
+      note: NOTE_REMOTE + ' Головний клас має називатися Main.',
+      code: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+        int sum = 0;
+        for (int i = 1; i <= 5; i++) {
+            sum += i;
+        }
+        System.out.println("Sum 1..5 = " + sum);
+    }
+}
+` },
+    { id: 'cpp', name: 'C++', file: 'main.cpp', kind: 'remote', j0: 105, note: NOTE_REMOTE,
+      code: `#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello, world!" << endl;
+    int sum = 0;
+    for (int i = 1; i <= 5; i++) sum += i;
+    cout << "Sum 1..5 = " << sum << endl;
+    return 0;
+}
+` },
+    { id: 'cs', name: 'C#', file: 'Program.cs', kind: 'remote', j0: 51, note: NOTE_REMOTE,
+      code: `using System;
+
+class Program {
+    static void Main() {
+        Console.WriteLine("Hello, world!");
+        int sum = 0;
+        for (int i = 1; i <= 5; i++) sum += i;
+        Console.WriteLine("Sum 1..5 = " + sum);
+    }
+}
+` },
+    { id: 'c', name: 'C', file: 'main.c', kind: 'remote', j0: 103, note: NOTE_REMOTE,
+      code: `#include <stdio.h>
+
+int main() {
+    printf("Hello, world!\\n");
+    int sum = 0;
+    for (int i = 1; i <= 5; i++) sum += i;
+    printf("Sum 1..5 = %d\\n", sum);
+    return 0;
+}
+` },
+    { id: 'ts', name: 'TypeScript', file: 'script.ts', kind: 'remote', j0: 101, note: NOTE_REMOTE,
+      code: `function sum(n: number): number {
+  let s = 0;
+  for (let i = 1; i <= n; i++) s += i;
+  return s;
+}
+
+console.log("Hello, world!");
+console.log("Sum 1..5 = " + sum(5));
+` },
+    { id: 'php', name: 'PHP', file: 'index.php', kind: 'remote', j0: 98, note: NOTE_REMOTE,
+      code: `<?php
+echo "Hello, world!\\n";
+$sum = 0;
+for ($i = 1; $i <= 5; $i++) {
+    $sum += $i;
+}
+echo "Sum 1..5 = " . $sum . "\\n";
+` },
+    { id: 'go', name: 'Go', file: 'main.go', kind: 'remote', j0: 107, note: NOTE_REMOTE,
+      code: `package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, world!")
+    sum := 0
+    for i := 1; i <= 5; i++ {
+        sum += i
+    }
+    fmt.Println("Sum 1..5 =", sum)
+}
+` }
+  ];
+
+  /* Фонові потоки: JavaScript і Python запускаються окремо, щоб нескінченний цикл не «підвісив» сторінку */
+  function jsWorkerMain() {
+    const st = self.setTimeout, ct = self.clearTimeout;
+    const act = new Set();
+    let lines = [], pos = 0;
+    const send = (kind, text) => self.postMessage({ t: 'out', kind: kind, text: text });
+    const fmt = args => args.map(v => {
+      if (typeof v === 'string') return v;
+      if (v instanceof Error) return v.name + ': ' + v.message;
+      try { return typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v); } catch (_) { return String(v); }
+    }).join(' ');
+    const report = err => send('e', (err && err.name ? err.name + ': ' : '') + (err && err.message ? err.message : String(err)) + '\n');
+    const check = () => st(() => { if (act.size === 0) self.postMessage({ t: 'done' }); }, 0);
+    self.console = {
+      log: (...a) => send('o', fmt(a) + '\n'), info: (...a) => send('o', fmt(a) + '\n'), debug: (...a) => send('o', fmt(a) + '\n'),
+      warn: (...a) => send('e', fmt(a) + '\n'), error: (...a) => send('e', fmt(a) + '\n')
+    };
+    self.prompt = () => (pos < lines.length ? lines[pos++] : null);
+    self.alert = m => send('o', String(m) + '\n');
+    self.setTimeout = (fn, ms, ...args) => {
+      const id = st(() => { act.delete(id); try { if (typeof fn === 'function') fn(...args); } catch (err) { report(err); } check(); }, ms);
+      act.add(id);
+      return id;
+    };
+    self.clearTimeout = id => { act.delete(id); ct(id); };
+    self.onunhandledrejection = ev => { report(ev.reason); };
+    self.onmessage = e => {
+      lines = String(e.data.input || '').split(/\r?\n/);
+      if (lines.length && lines[lines.length - 1] === '') lines.pop();
+      pos = 0;
+      try { (0, eval)(e.data.code); } catch (err) { report(err); }
+      check();
+    };
+  }
+
+  function pyWorkerMain() {
+    let py = null;
+    const send = (kind, text) => self.postMessage({ t: 'out', kind: kind, text: text });
+    self.onmessage = async e => {
+      const lines = String(e.data.input || '').split(/\r?\n/);
+      if (lines.length && lines[lines.length - 1] === '') lines.pop();
+      let pos = 0;
+      try {
+        if (!py) {
+          self.postMessage({ t: 'status', text: 'Завантажую Python…' });
+          importScripts('https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js');
+          py = await loadPyodide();
+        }
+        py.setStdin({ stdin: () => (pos < lines.length ? lines[pos++] : undefined) });
+        py.setStdout({ batched: s => send('o', s + '\n') });
+        py.setStderr({ batched: s => send('e', s + '\n') });
+        self.postMessage({ t: 'started' });
+        const g = py.runPython("{'__name__': '__main__'}");
+        try { await py.runPythonAsync(e.data.code, { globals: g }); } finally { g.destroy(); }
+      } catch (err) {
+        let m = String(err && err.message ? err.message : err);
+        if (!py) {
+          m = 'Не вдалося завантажити Python. Потрібне підключення до інтернету.';
+        } else {
+          m = m.replace(/^PythonError: /, '');
+          const k = m.search(/\n *File "<exec>"/);
+          if (k >= 0) m = 'Traceback (most recent call last):' + m.slice(k);
+        }
+        send('e', m.trim() + '\n');
+      }
+      self.postMessage({ t: 'done' });
+    };
+  }
+
+  const workerSrc = fn => '(' + fn.toString() + ')()';
+  let pyWorker = null;
+  let busy = false, hadErr = false;
+  const state = {};
+  LANGS.forEach(l => { state[l.id] = { code: l.code, stdin: l.stdin || '' }; });
+  let curId = LANGS[0].id;
+  const cur = () => LANGS.find(l => l.id === curId);
+  sel.innerHTML = LANGS.map(l => '<option value="' + l.id + '">' + l.name + '</option>').join('');
+
+  function print(text, cls) {
+    const s = document.createElement('span');
+    if (cls) s.className = cls;
+    if (cls === 'err') hadErr = true;
+    s.textContent = text;
+    resEl.append(s);
+    resEl.scrollTop = resEl.scrollHeight;
+  }
+  function resetOutput() {
+    hadErr = false;
+    resEl.textContent = '';
+    print('Тут з’явиться результат. Натисніть «Запустити».', 'dim');
+    hadErr = false;
+    frame.hidden = true;
+    frame.removeAttribute('srcdoc');
+    resEl.hidden = false;
+    statusEl.textContent = '';
+  }
+  function save() { state[curId] = { code: codeEl.value, stdin: stdinEl.value }; }
+  function load() {
+    const l = cur();
+    codeEl.value = state[l.id].code;
+    stdinEl.value = state[l.id].stdin;
+    stdinBox.hidden = l.kind === 'html';
+    noteEl.textContent = l.note;
+    resetOutput();
+  }
+
+  /* Запуск JavaScript або Python у фоновому потоці */
+  function runLocal(kind, src, input) {
+    return new Promise(resolve => {
+      let w = kind === 'py' ? pyWorker : null;
+      if (!w) {
+        w = new Worker(URL.createObjectURL(new Blob([workerSrc(kind === 'py' ? pyWorkerMain : jsWorkerMain)], { type: 'text/javascript' })));
+        if (kind === 'py') pyWorker = w;
+      }
+      let timer = null, finished = false;
+      const finish = msg => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        w.onmessage = null;
+        w.onerror = null;
+        if (msg) print(msg, 'err');
+        if (kind !== 'py' || msg) {
+          w.terminate();
+          if (kind === 'py') pyWorker = null;
+        }
+        resolve();
+      };
+      const arm = ms => {
+        clearTimeout(timer);
+        timer = setTimeout(() => finish('\nЧас виконання вийшов (' + ms / 1000 + ' с). Перевірте, чи немає нескінченного циклу.\n'), ms);
+      };
+      w.onmessage = e => {
+        const d = e.data;
+        if (d.t === 'out') print(d.text, d.kind === 'e' ? 'err' : '');
+        else if (d.t === 'status') statusEl.textContent = d.text;
+        else if (d.t === 'started') { statusEl.textContent = 'Виконується…'; arm(10000); }
+        else if (d.t === 'done') finish();
+      };
+      w.onerror = ev => finish('Помилка: ' + (ev.message || 'не вдалося запустити код') + '\n');
+      if (kind === 'js') arm(5000);
+      w.postMessage({ code: src, input: input });
+    });
+  }
+
+  /* Запуск мов, яких браузер сам не виконує, через онлайн-сервіс Judge0 */
+  const b64e = s => { let bin = ''; new TextEncoder().encode(s).forEach(c => { bin += String.fromCharCode(c); }); return btoa(bin); };
+  const b64d = s => (s ? new TextDecoder().decode(Uint8Array.from(atob(String(s).replace(/\s/g, '')), c => c.charCodeAt(0))) : '');
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const STATUS = { 3: 'Готово', 5: 'Перевищено ліміт часу', 6: 'Помилка компіляції', 13: 'Збій сервісу', 14: 'Помилка запуску' };
+
+  async function runRemote(lang, src, input) {
+    const base = JUDGE0 + '/submissions';
+    const r = await fetch(base + '?base64_encoded=true&wait=false', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source_code: b64e(src), language_id: lang.j0, stdin: b64e(input || '') })
+    });
+    if (r.status === 429) throw new Error('Сервіс запуску зараз перевантажений. Спробуйте ще раз за хвилину.');
+    if (!r.ok) throw new Error('Сервіс запуску відповів помилкою (' + r.status + '). Спробуйте пізніше.');
+    const token = (await r.json()).token;
+    let d = null;
+    for (let i = 0; i < 25; i++) {
+      await sleep(i < 3 ? 700 : 1200);
+      const g = await fetch(base + '/' + token + '?base64_encoded=true&fields=stdout,stderr,compile_output,message,status,time');
+      if (!g.ok) throw new Error('Не вдалося отримати результат (' + g.status + ').');
+      d = await g.json();
+      if (d.status && d.status.id > 2) break;
+      d = null;
+    }
+    if (!d) throw new Error('Сервіс запуску не встиг відповісти. Спробуйте ще раз.');
+    const out = b64d(d.stdout), err = b64d(d.stderr), comp = b64d(d.compile_output), msg = b64d(d.message);
+    if (comp) print(comp.endsWith('\n') ? comp : comp + '\n', 'err');
+    if (out) print(out);
+    if (err) print(err.endsWith('\n') ? err : err + '\n', 'err');
+    if (msg) print(msg + '\n', 'err');
+    const id = d.status.id;
+    const label = STATUS[id] || (id >= 7 && id <= 12 ? 'Помилка виконання' : d.status.description);
+    if (id !== 3) hadErr = true;
+    return label + (d.time ? ' · ' + d.time + ' с' : '');
+  }
+
+  async function run() {
+    if (busy) return;
+    busy = true;
+    runBtn.disabled = true;
+    sel.disabled = true;
+    save();
+    const l = cur();
+    resEl.textContent = '';
+    hadErr = false;
+    try {
+      if (l.kind === 'html') {
+        resEl.hidden = true;
+        frame.hidden = false;
+        frame.srcdoc = codeEl.value;
+        statusEl.textContent = 'Готово';
+      } else {
+        frame.hidden = true;
+        resEl.hidden = false;
+        statusEl.textContent = 'Виконується…';
+        const label = l.kind === 'remote' ? await runRemote(l, codeEl.value, stdinEl.value) : await runLocal(l.kind, codeEl.value, stdinEl.value);
+        if (!resEl.textContent) print('(програма нічого не вивела)', 'dim');
+        statusEl.textContent = label || (hadErr ? 'Завершено з помилкою' : 'Готово');
+      }
+    } catch (e) {
+      const net = e instanceof TypeError;
+      print(net ? 'Не вдалося зв’язатися із сервісом запуску коду. Перевірте інтернет і спробуйте ще раз.\n' : (e.message || String(e)) + '\n', 'err');
+      statusEl.textContent = 'Помилка';
+    }
+    busy = false;
+    runBtn.disabled = false;
+    sel.disabled = false;
+  }
+
+  /* Завантаження коду файлом */
+  function download() {
+    const l = cur();
+    let name = l.file;
+    if (l.id === 'java') {
+      const m = /public\s+(?:final\s+)?class\s+(\w+)/.exec(codeEl.value);
+      if (m) name = m[1] + '.java';
+    }
+    const url = URL.createObjectURL(new Blob([codeEl.value], { type: 'text/plain;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  /* Tab вставляє відступ, Esc + Tab виходить із поля, Ctrl+Enter запускає */
+  let escaped = false;
+  codeEl.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { escaped = true; return; }
+    if (e.key === 'Tab' && !e.shiftKey && !escaped) {
+      e.preventDefault();
+      codeEl.setRangeText('    ', codeEl.selectionStart, codeEl.selectionEnd, 'end');
+    } else if (e.key !== 'Tab') {
+      escaped = false;
+    }
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); }
+  });
+  codeEl.addEventListener('blur', () => { escaped = false; });
+
+  /* Зміна висоти обох вікон: тягнемо смужку під ними або тиснемо стрілки */
+  const grip = byId('grip'), box = byId('playBox');
+  if (grip && box) {
+    let dragging = false, startY = 0, startH = 0;
+    const setH = px => box.style.setProperty('--play-h', Math.max(256, Math.min(px, 2400)) + 'px');
+    const curH = () => box.firstElementChild.getBoundingClientRect().height;
+    grip.addEventListener('pointerdown', e => {
+      dragging = true;
+      startY = e.clientY;
+      startH = curH();
+      grip.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    grip.addEventListener('pointermove', e => { if (dragging) setH(startH + e.clientY - startY); });
+    const stop = () => { dragging = false; };
+    grip.addEventListener('pointerup', stop);
+    grip.addEventListener('pointercancel', stop);
+    grip.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); setH(curH() + 40); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setH(curH() - 40); }
+    });
+  }
+
+  sel.addEventListener('change', () => { save(); curId = sel.value; load(); });
+  runBtn.addEventListener('click', run);
+  dlBtn.addEventListener('click', download);
+  load();
+})();
+</script>
 </body>
 </html>
