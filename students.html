@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Учням — Кабінет інформатики</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Розклад дзвінків: кольори беруться від теми сайту, тому працює і в світлій, і в темній */
+    .bells { display: grid; gap: 8px; margin-top: 16px; }
+    .bell-row {
+      display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 14px;
+      padding: 12px 16px; border-radius: 14px;
+      border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+      background: color-mix(in srgb, currentColor 4%, transparent);
+      transition: transform .15s ease, background .15s ease;
+    }
+    .bell-row:hover { transform: translateX(3px); }
+    .bell-num {
+      width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+      font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 1.05rem;
+      background: color-mix(in srgb, currentColor 12%, transparent);
+    }
+    .bell-time { font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; font-weight: 500; letter-spacing: .02em; }
+    .bell-len { font-size: .82rem; opacity: .65; }
+    .bell-break {
+      display: flex; align-items: center; gap: 10px; padding: 2px 16px 2px 74px;
+      font-size: .82rem; opacity: .6; font-family: 'JetBrains Mono', monospace;
+    }
+    .bell-break::before { content: ''; width: 22px; border-top: 2px dotted currentColor; opacity: .6; }
+    .bell-break.long { opacity: .85; font-weight: 500; }
+    .bell-row.now { border-width: 2px; border-color: currentColor; background: color-mix(in srgb, currentColor 12%, transparent); }
+    .bell-row.now .bell-num { background: currentColor; }
+    .bell-row.now .bell-num span { color: Canvas; }
+    .bell-break.now { opacity: 1; font-weight: 600; }
+    .bell-status {
+      margin-top: 14px; padding: 12px 16px; border-radius: 14px; font-weight: 500;
+      border: 1px dashed color-mix(in srgb, currentColor 35%, transparent);
+    }
+    .bell-status b { font-family: 'JetBrains Mono', monospace; }
+    .quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 14px; }
+    .tip .ico { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+    @media (max-width: 520px) {
+      .bell-row { grid-template-columns: 40px 1fr; }
+      .bell-len { grid-column: 2; }
+      .bell-break { padding-left: 54px; }
+    }
+  </style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="index.html"><span class="mark" aria-hidden="true">&lt;/&gt;</span><span>Кабінет інформатики</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Змінити тему оформлення"></button>
+    <nav class="tabs" id="tabs" aria-label="Розділи сайту">
+      <a href="index.html">Головна</a>
+      <a href="students.html" aria-current="page">Учням</a>
+      <a href="parents.html">Батькам</a>
+      <a href="materials.html">Навчальні матеріали</a>
+      <a href="about.html">Про мене</a>
+      <a href="help.html">Допомога</a>
+      <a href="fun.html">Цікавинки</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="students" class="page" aria-labelledby="h-students">
+    <div class="head">
+      <span class="eyebrow">Для учнів 5–11 класів</span>
+      <h2 id="h-students">Учням</h2>
+      <p class="lead">Тут усе, що потрібно для успішного року: коли дзвінок, що ми вивчатимемо, як отримати високий бал і де потренуватися вдома. Інформатика — це не лише кнопки й мишка, а ще вміння мислити, створювати й розв’язувати задачі.</p>
+      <div class="quick" aria-label="Швидкі переходи">
+        <a class="chip" href="#bells">🔔 Розклад дзвінків</a>
+        <a class="chip" href="#plan">🗺️ План року</a>
+        <a class="chip" href="#tips">⭐ Як отримати високий бал</a>
+        <a class="chip" href="#rules">🖥️ Правила в класі</a>
+        <a class="chip" href="#grades-info">📊 Оцінювання</a>
+        <a class="chip" href="#tools">🧰 Сервіси</a>
+      </div>
+    </div>
+
+    <div class="block" id="bells">
+      <h3>🔔 Розклад дзвінків</h3>
+      <p>Уроки тривають по 45 хвилин. Перерви між ними короткі, тож не затримуйтесь у коридорі: у кабінеті інформатики ми починаємо одразу після дзвінка.</p>
+      <div class="bells" id="bellList" aria-label="Розклад уроків і перерв"></div>
+      <div class="bell-status" id="bellStatus" aria-live="polite"></div>
+    </div>
+
+    <div class="block" id="plan">
+      <h3>🗺️ Орієнтовний план року</h3>
+      <p>Обери свій клас і подивись, що на тебе чекає. Остаточний порядок тем залежить від календарного планування, тож про зміни я нагадуватиму на уроках.</p>
+      <div class="chips" id="grades" role="group" aria-label="Клас"></div>
+      <ol class="topics" id="topics"></ol>
+    </div>
+
+    <div class="block" id="tips">
+      <h3>⭐ Як отримати високий бал</h3>
+      <div class="tips">
+        <article class="card tip"><span class="ico" aria-hidden="true">🧠</span><h4>Розумій, а не заучуй</h4><p>Якщо можеш пояснити тему однокласникові своїми словами, значить, ти її справді знаєш.</p></article>
+        <article class="card tip"><span class="ico" aria-hidden="true">🐞</span><h4>Помилка — це нормально</h4><p>Програмісти шукають помилки щодня. Знайшов свою й виправив сам? Це вже крок до високого рівня.</p></article>
+        <article class="card tip"><span class="ico" aria-hidden="true">⌨️</span><h4>Друкуй наосліп</h4><p>По 10 хвилин на день на клавіатурному тренажері, і за місяць ти працюватимеш помітно швидше.</p></article>
+        <article class="card tip"><span class="ico" aria-hidden="true">💾</span><h4>Зберігай роботу</h4><p>Натискай «Зберегти» кожні кілька хвилин і підписуй файли: прізвище, клас, тема.</p></article>
+        <article class="card tip"><span class="ico" aria-hidden="true">🙋</span><h4>Став запитання</h4><p>Не зрозумів — спитай одразу. Краще перепитати на уроці, ніж гадати вдома.</p></article>
+        <article class="card tip"><span class="ico" aria-hidden="true">🤝</span><h4>Допомагай іншим</h4><p>Пояснюючи комусь, ти закріплюєш знання сам. Допомога однокласникам враховується під час оцінювання.</p></article>
+        <article class="card tip"><span class="ico" aria-hidden="true">⏰</span><h4>Плануй час</h4><p>Великий проєкт розбий на маленькі кроки й розклади їх по днях. Так не доведеться робити все в останній вечір.</p></article>
+        <article class="card tip"><span class="ico" aria-hidden="true">👀</span><h4>Бережи очі й спину</h4><p>Кожні 20 хвилин дивись 20 секунд на предмет удалині. Сиди рівно, а екран тримай на рівні очей.</p></article>
+      </div>
+    </div>
+
+    <div class="split" id="rules">
+      <div class="col block">
+        <h3>🖥️ Правила в комп’ютерному класі</h3>
+        <ul class="list rules">
+          <li><b>Заходь спокійно.</b> Залишай сумку біля входу, їжа й напої лишаються за дверима.</li>
+          <li><b>Не чіпай проводи й розетки.</b> Якщо щось блимає або пахне, одразу скажи вчителеві.</li>
+          <li><b>Працюй під своїм обліковим записом.</b> Пароль нікому не повідомляй.</li>
+          <li><b>Роби перерви.</b> Очі відпочивають під час гімнастики, яку ми проводимо на уроці.</li>
+          <li><b>Зберігай роботу.</b> Підписуй файли своїм прізвищем і класом, зберігай у вказану папку.</li>
+          <li><b>Стався до техніки дбайливо.</b> Закінчив роботу — коректно закрий програми й вимкни комп’ютер.</li>
+        </ul>
+      </div>
+      <div class="col block" id="grades-info">
+        <h3>📊 Як виставляються оцінки</h3>
+        <p>Оцінки ставляться за 12-бальною шкалою. Їх складають кілька видів робіт:</p>
+        <ul class="list">
+          <li><b>Практичні роботи.</b> Результат на комп’ютері й пояснення, як ти до нього дійшов.</li>
+          <li><b>Тести й короткі опитування.</b> Перевіряють розуміння теми.</li>
+          <li><b>Проєкти.</b> Індивідуальні чи в парі, з коротким захистом.</li>
+          <li><b>Робота на уроці.</b> Допомога однокласникам, активна участь, акуратність.</li>
+        </ul>
+        <p><b>Рівні:</b> початковий (1–3), середній (4–6), достатній (7–9), високий (10–12). Перед кожною роботою я називаю критерії, щоб ти знав, за що отримаєш бали.</p>
+        <p class="note">Пропустив урок? Матеріали є в розділі «Навчальні матеріали», а питання можна поставити на наступному уроці або на консультації. Час консультацій: <span data-fill="consult"></span></p>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3>🆘 Що робити, якщо…</h3>
+      <div>
+        <details><summary>Комп’ютер завис або програма не відповідає</summary><div class="ans">Почекай хвилину, не тисни всі клавіші підряд. Якщо не допомогло, підніми руку: я підійду. Не вимикай комп’ютер кнопкою без дозволу, бо можна втратити роботу.</div></details>
+        <details><summary>Я не встигаю виконати практичну роботу</summary><div class="ans">Збережи те, що встиг зробити, і скажи мені. Роботу можна дописати на наступному уроці або на консультації.</div></details>
+        <details><summary>Я забув пароль від облікового запису</summary><div class="ans">Не вгадуй багато разів поспіль, акаунт може заблокуватися. Напиши мені або підійди після уроку, і ми відновимо доступ.</div></details>
+        <details><summary>Я пропустив урок</summary><div class="ans">Зайди в розділ «Навчальні матеріали», знайди свій клас і тему, перегляньте разом з однокласником, що було. Якщо щось незрозуміло, прийди на консультацію.</div></details>
+        <details><summary>Мені дуже цікаво, хочу більше, ніж на уроці</summary><div class="ans">Чудово! Спробуй сервіси нижче, зроби власний мініпроєкт і покажи його класу. Додаткові завдання можна обговорити зі мною.</div></details>
+      </div>
+    </div>
+
+    <div class="block" id="tools">
+      <h3>🧰 Корисні сервіси для навчання</h3>
+      <div class="grid">
+        <a class="card tool" href="https://scratch.mit.edu/" target="_blank" rel="noopener"><span class="host">scratch.mit.edu</span><h4>Scratch</h4><p>Візуальне програмування блоками. Добре підходить для перших кроків.</p></a>
+        <a class="card tool" href="https://hourofcode.com/" target="_blank" rel="noopener"><span class="host">hourofcode.com</span><h4>Година коду</h4><p>Короткі ігрові завдання, які можна пройти за один вечір.</p></a>
+        <a class="card tool" href="https://code.org/" target="_blank" rel="noopener"><span class="host">code.org</span><h4>Code.org</h4><p>Безкоштовні курси програмування для школярів різного віку.</p></a>
+        <a class="card tool" href="https://www.python.org/" target="_blank" rel="noopener"><span class="host">python.org</span><h4>Python</h4><p>Офіційний сайт мови: завантаження, документація й приклади.</p></a>
+        <a class="card tool" href="https://www.typingclub.com/" target="_blank" rel="noopener"><span class="host">typingclub.com</span><h4>Клавіатурний тренажер</h4><p>Вчимося друкувати наосліп. Достатньо по 10 хвилин щодня.</p></a>
+        <a class="card tool" href="https://lms.e-school.net.ua/" target="_blank" rel="noopener"><span class="host">lms.e-school.net.ua</span><h4>Всеукраїнська школа онлайн</h4><p>Відеоуроки та тести за шкільною програмою, зокрема з інформатики.</p></a>
+        <a class="card tool" href="https://www.tinkercad.com/" target="_blank" rel="noopener"><span class="host">tinkercad.com</span><h4>Tinkercad</h4><p>Проста програма для 3D-моделювання й електронних схем просто в браузері.</p></a>
+        <a class="card tool" href="https://www.khanacademy.org/" target="_blank" rel="noopener"><span class="host">khanacademy.org</span><h4>Khan Academy</h4><p>Безкоштовні відеоуроки й вправи з комп’ютерних наук, математики та інших предметів.</p></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="year"></span> <span data-fill="name"></span>, <span data-fill="school"></span></span>
+    <span>Сайт вчителя інформатики</span>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+/* Розклад дзвінків. Щоб змінити час, правте лише цей масив. */
+(function () {
+  const LESSONS = [
+    ['08:30', '09:15'],
+    ['09:25', '10:10'],
+    ['10:30', '11:15'],
+    ['11:35', '12:20'],
+    ['12:30', '13:15'],
+    ['13:25', '14:10'],
+    ['14:20', '15:05']
+  ];
+  const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  const list = document.getElementById('bellList');
+  const status = document.getElementById('bellStatus');
+  if (!list) return;
+
+  let html = '';
+  LESSONS.forEach((l, i) => {
+    html += `<div class="bell-row" data-l="${i}"><div class="bell-num"><span>${i + 1}</span></div><div class="bell-time">${l[0]} – ${l[1]}</div><div class="bell-len">${toMin(l[1]) - toMin(l[0])} хв</div></div>`;
+    if (i < LESSONS.length - 1) {
+      const br = toMin(LESSONS[i + 1][0]) - toMin(l[1]);
+      html += `<div class="bell-break${br >= 20 ? ' long' : ''}" data-b="${i}">перерва ${br} хв${br >= 20 ? ' — час перекусити' : ''}</div>`;
+    }
+  });
+  list.innerHTML = html;
+
+  function tick() {
+    const now = new Date();
+    const day = now.getDay();
+    const m = now.getHours() * 60 + now.getMinutes();
+    list.querySelectorAll('.now').forEach(e => e.classList.remove('now'));
+    if (day === 0 || day === 6) { status.innerHTML = 'Сьогодні вихідний. Гарного відпочинку! 🌿'; return; }
+    if (m < toMin(LESSONS[0][0])) {
+      status.innerHTML = `Перший урок почнеться о <b>${LESSONS[0][0]}</b>.`; return;
+    }
+    for (let i = 0; i < LESSONS.length; i++) {
+      const s = toMin(LESSONS[i][0]), e = toMin(LESSONS[i][1]);
+      if (m >= s && m < e) {
+        list.querySelector(`[data-l="${i}"]`).classList.add('now');
+        status.innerHTML = `Зараз іде <b>${i + 1} урок</b>. До дзвінка: <b>${e - m} хв</b>.`; return;
+      }
+      if (i < LESSONS.length - 1 && m >= e && m < toMin(LESSONS[i + 1][0])) {
+        const b = list.querySelector(`[data-b="${i}"]`); if (b) b.classList.add('now');
+        status.innerHTML = `Зараз перерва. <b>${i + 2} урок</b> почнеться через <b>${toMin(LESSONS[i + 1][0]) - m} хв</b>.`; return;
+      }
+    }
+    status.innerHTML = 'Уроки на сьогодні закінчилися. Не забудь про домашнє завдання! 📚';
+  }
+  tick();
+  setInterval(tick, 30000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Кабінет інформатики — Головна</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Стилі лише для головної сторінки; кольори беруться зі змінних теми сайту */
+    .demo { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px dashed var(--code-dim); }
+    .demo label { font-size: 0.8rem; color: var(--code-dim); }
+    .code .inp { background: rgba(255, 255, 255, 0.07); color: var(--code-ink); border-color: var(--code-dim); }
+    .code .inp::placeholder { color: var(--code-dim); }
+    .code .hl { color: var(--code-str); }
+    .info { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); }
+    .info .card { gap: 0.35rem; }
+    .info .ico { font-size: 1.5rem; line-height: 1; }
+    .info .lab { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+    .info .big { font-family: var(--f-display); font-size: 1.1rem; font-weight: 500; line-height: 1.35; color: var(--ink); }
+    .info .big b { color: var(--accent); }
+    .info .small { font-size: 0.9rem; color: var(--ink-2); }
+    .qgrid { display: grid; gap: 1rem; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    .qgrid > .qlink { grid-column: span 3; }
+    .qgrid > .qlink:nth-child(n+5) { grid-column: span 6; }
+    @media (max-width: 960px) { .qgrid > .qlink, .qgrid > .qlink:nth-child(n+5) { grid-column: span 6; } }
+    @media (max-width: 560px) { .qgrid > .qlink, .qgrid > .qlink:nth-child(n+5) { grid-column: span 12; } }
+    .qlink h4 { display: flex; align-items: center; gap: 0.5rem; }
+    .qlink .ico { font-size: 1.3rem; }
+    .qlink .go { margin-top: auto; padding-top: 0.4rem; font: 500 0.85rem var(--f-mono); color: var(--accent); }
+    .daily { display: grid; gap: 1.5rem; grid-template-columns: auto minmax(0, 1fr); align-items: center; padding: 1.4rem 1.6rem; border-radius: 18px; background: var(--butter); }
+    .daily .bulb { font-size: 2.6rem; line-height: 1; }
+    .daily h3 { font-size: 1.05rem; margin-bottom: 0.4rem; }
+    .daily .q { font-weight: 600; margin-bottom: 0.25rem; }
+    .daily .a { color: var(--ink); max-width: 68ch; }
+    .daily .more { margin-top: 0.6rem; font: 500 0.85rem var(--f-mono); }
+    @media (max-width: 520px) { .daily { grid-template-columns: 1fr; } }
+    .board { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+    .note { position: relative; display: flex; flex-direction: column; gap: 0.55rem; padding: 1.1rem 1.25rem; border-radius: 16px; transition: transform 0.15s ease; }
+    .note:hover { transform: translateY(-2px); }
+    .note.pin { grid-column: span 2; box-shadow: inset 0 0 0 2px var(--accent); }
+    .note.wide { grid-column: span 2; }
+    .note-top { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .note-ico { font-size: 1.5rem; line-height: 1; }
+    .note .tag { font: 500 0.78rem var(--f-mono); color: var(--accent); }
+    .note .badge { margin-left: auto; font: 600 0.72rem var(--f-mono); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 0.12rem 0.6rem; }
+    .note .badge + .badge { margin-left: 0; }
+    .note h4 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+    .note p { color: var(--ink); }
+    .note-date { margin-top: auto; padding-top: 0.3rem; font: 500 0.8rem var(--f-mono); color: var(--ink-2); }
+    @media (max-width: 700px) { .note.pin, .note.wide { grid-column: auto; } }
+    @media (prefers-reduced-motion: reduce) { .note { transition: none; } .note:hover { transform: none; } }
+  </style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="index.html"><span class="mark" aria-hidden="true">&lt;/&gt;</span><span>Кабінет інформатики</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Змінити тему оформлення"></button>
+    <nav class="tabs" id="tabs" aria-label="Розділи сайту">
+      <a href="index.html" aria-current="page">Головна</a>
+      <a href="students.html">Учням</a>
+      <a href="parents.html">Батькам</a>
+      <a href="materials.html">Навчальні матеріали</a>
+      <a href="about.html">Про мене</a>
+      <a href="help.html">Допомога</a>
+      <a href="fun.html">Цікавинки</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="home" class="page" aria-labelledby="h-home">
+    <div class="hero">
+      <div class="stack">
+        <span class="eyebrow">Вчитель інформатики · <span data-fill="school"></span></span>
+        <h1 id="h-home">Привіт! Я <span data-fill="name"></span>, і ми разом вивчаємо інформатику</h1>
+        <p class="lead">Тут учні знаходять завдання та матеріали до уроків, батьки отримують відповіді на запитання про навчання, а всі разом можуть заглянути в цікавий світ технологій.</p>
+      </div>
+      <div class="code" aria-label="Приклад програми мовою Python">
+        <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        <pre><span class="dim"># перша програма на уроці</span>
+name = <span class="kw">input</span>(<span class="str">"Як тебе звати? "</span>)
+<span class="kw">print</span>(<span class="str">"Привіт,"</span>, name + <span class="str">"!"</span>)
+<span class="kw">print</span>(<span class="str">"Починаємо урок."</span>)
+
+<span class="dim">&gt;&gt;&gt; Як тебе звати? </span><span class="hl" id="demoShow">Марія</span>
+<span class="dim">&gt;&gt;&gt; Привіт, </span><span class="hl" id="demoHi">Марія</span><span class="dim">!</span>
+<span class="dim">&gt;&gt;&gt; Починаємо урок.</span></pre>
+        <div class="demo">
+          <label for="demoName">▶ Спробуй сам: введи своє ім’я й подивись, що виведе програма</label>
+          <input class="inp" id="demoName" type="text" maxlength="20" placeholder="Марія" autocomplete="off">
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3>Сьогодні в кабінеті</h3>
+      <div class="info">
+        <div class="card t-mint">
+          <span class="ico" aria-hidden="true">🔔</span>
+          <span class="lab">Зараз</span>
+          <p class="big" id="homeBell" aria-live="polite">Завантаження…</p>
+          <a class="small" href="students.html#bells">Увесь розклад дзвінків</a>
+        </div>
+        <div class="card t-sage">
+          <span class="ico" aria-hidden="true">🗓️</span>
+          <span class="lab">Консультації</span>
+          <p class="big" data-fill="consult"></p>
+          <span class="small">Приходьте з питаннями: розберемо будь-яку тему.</span>
+        </div>
+        <div class="card t-butter">
+          <span class="ico" aria-hidden="true">✉️</span>
+          <span class="lab">Зв’язок</span>
+          <p class="big mono" style="font-size:0.98rem; overflow-wrap:anywhere" data-fill="email"></p>
+          <a class="small" href="help.html">Як мені написати</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3>Куди піти далі</h3>
+      <div class="grid qgrid">
+        <a class="card qlink t-sage" href="students.html"><h4><span class="ico" aria-hidden="true">🎒</span>Учням</h4><p>План року за класами, розклад дзвінків, правила в кабінеті, оцінювання й корисні сервіси.</p><span class="go">Відкрити →</span></a>
+        <a class="card qlink t-mint" href="parents.html"><h4><span class="ico" aria-hidden="true">👪</span>Батькам</h4><p>Як допомогти дитині вдома, безпека в інтернеті, система оцінювання та відповіді на запитання.</p><span class="go">Відкрити →</span></a>
+        <a class="card qlink t-butter" href="materials.html"><h4><span class="ico" aria-hidden="true">📚</span>Навчальні матеріали</h4><p>Підручники, презентації, практичні роботи й тести. Можна відфільтрувати за класом.</p><span class="go">Відкрити →</span></a>
+        <a class="card qlink t-mint" href="about.html"><h4><span class="ico" aria-hidden="true">👩‍🏫</span>Про мене</h4><p>Коротко про мій підхід до навчання та як зі мною зв’язатися.</p><span class="go">Відкрити →</span></a>
+        <a class="card qlink t-butter" href="help.html"><h4><span class="ico" aria-hidden="true">🆘</span>Допомога</h4><p>Підказки, коли щось не працює, і як зі мною зв’язатися.</p><span class="go">Відкрити →</span></a>
+        <a class="card qlink t-sage" href="fun.html"><h4><span class="ico" aria-hidden="true">🎲</span>Цікавинки</h4><p>Факти з історії комп’ютерів, перекладач у двійковий код і міні-вікторина.</p><span class="go">Відкрити →</span></a>
+      </div>
+    </div>
+
+    <div class="daily" id="daily" hidden>
+      <span class="bulb" aria-hidden="true">💡</span>
+      <div>
+        <h3>Знаєш, що…</h3>
+        <p class="q" id="dailyQ"></p>
+        <p class="a" id="dailyA"></p>
+        <p class="more"><a href="fun.html">Більше фактів і вікторина →</a></p>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3>📌 Дошка оголошень</h3>
+      <div class="board" id="news"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="year"></span> <span data-fill="name"></span>, <span data-fill="school"></span></span>
+    <span>Сайт вчителя інформатики</span>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+(function () {
+  /* 1. Інтерактивна демо-програма в блоці з кодом */
+  const inp = document.getElementById('demoName');
+  const show = document.getElementById('demoShow');
+  const hi = document.getElementById('demoHi');
+  if (inp && show && hi) {
+    inp.addEventListener('input', () => {
+      const v = inp.value.trim() || 'Марія';
+      show.textContent = v;
+      hi.textContent = v;
+    });
+  }
+
+  /* 2. Що зараз: урок чи перерва. Час уроків змінюйте тут (і так само в students.html). */
+  const LESSONS = [
+    ['08:30', '09:15'], ['09:25', '10:10'], ['10:30', '11:15'], ['11:35', '12:20'],
+    ['12:30', '13:15'], ['13:25', '14:10'], ['14:20', '15:05']
+  ];
+  const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  const bell = document.getElementById('homeBell');
+  function tick() {
+    if (!bell) return;
+    const now = new Date(), day = now.getDay(), m = now.getHours() * 60 + now.getMinutes();
+    if (day === 0 || day === 6) { bell.innerHTML = 'Сьогодні вихідний. Гарного відпочинку! 🌿'; return; }
+    if (m < toMin(LESSONS[0][0])) { bell.innerHTML = `Перший урок о <b>${LESSONS[0][0]}</b>`; return; }
+    for (let i = 0; i < LESSONS.length; i++) {
+      const s = toMin(LESSONS[i][0]), e = toMin(LESSONS[i][1]);
+      if (m >= s && m < e) { bell.innerHTML = `Іде <b>${i + 1} урок</b>, до дзвінка <b>${e - m} хв</b>`; return; }
+      if (i < LESSONS.length - 1 && m >= e && m < toMin(LESSONS[i + 1][0])) {
+        bell.innerHTML = `Перерва. <b>${i + 2} урок</b> через <b>${toMin(LESSONS[i + 1][0]) - m} хв</b>`; return;
+      }
+    }
+    bell.innerHTML = 'Уроки закінчилися. Не забудь про домашнє завдання! 📚';
+  }
+  tick();
+  setInterval(tick, 30000);
+
+  /* 3. Факт дня: щодня інший, береться з вікторини */
+  if (typeof FACTS !== 'undefined' && FACTS.length) {
+    const f = FACTS[Math.floor(Date.now() / 86400000) % FACTS.length];
+    document.getElementById('dailyQ').textContent = f.q;
+    document.getElementById('dailyA').textContent = f.w;
+    document.getElementById('daily').hidden = false;
+  }
+})();
+</script>
+</body>
+</html>
